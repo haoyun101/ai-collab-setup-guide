@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Optional update. Missing tools, credentials or network leave the skill usable.
+# Optional update. Missing tools or network leave the skill usable.
 set -eu
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 repo=haoyun101/ai-collab-setup-guide
@@ -16,6 +16,7 @@ update() {
     trap 'if [[ -d "$stage/previous/skill" && ! -e "$root" ]]; then mv "$stage/previous/skill" "$root" || exit 0; fi; rm -rf -- "$stage"' EXIT
     # Fetch a single snapshot so the payload and VERSION come from the same commit.
     curl -fsSL --max-time 15 "https://codeload.github.com/$repo/tar.gz/refs/heads/main" > "$stage/package.tar.gz" || return 0
+    mkdir "$stage/next" || return 0
     tar -xzf "$stage/package.tar.gz" --strip-components=1 -C "$stage/next" || return 0
     [[ -f "$stage/next/SKILL.md" && -f "$stage/next/scripts/check-update.sh" ]] || return 0
     latest=$(cat "$stage/next/VERSION") || return 0
